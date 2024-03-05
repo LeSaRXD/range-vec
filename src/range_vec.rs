@@ -72,6 +72,49 @@ impl<T> RangeVec<T> {
 	pub fn len(&self) -> usize {
 		self.len
 	}
+
+	// Adds an element to the end of the vector if there is space left
+	pub fn push(&mut self, element: T) -> RangeVecResult<()> {
+		if self.len >= self.max_size {
+			return Err(CantAdd);
+		}
+		unsafe {
+			ptr::write(self.pointer.add(self.len), element);
+		}
+		self.len += 1;
+		Ok(())
+	}
+	// Tries adding an element to the end of the vector if there is space left.
+	// Returns Some(()) if it succeeded, None otherwise
+	pub fn try_push(&mut self, element: T) -> Option<()> {
+		self.push(element).ok()
+	}
+
+	// Removes and returns an element from the end of the vector if there are enough left
+	pub fn pop(&mut self) -> RangeVecResult<T> {
+		if self.len <= self.min_size {
+			return Err(CantRemove);
+		}
+		let elem = unsafe {
+			ptr::read(self.pointer.add(self.len - 1))
+		};
+		self.len -= 1;
+		Ok(elem)
+	}
+	// Tries removeing and returning an element from the end of the vector if there are enough left
+	// Returns Some(element) if it succeeded, None otherwise
+	pub fn try_pop(&mut self) -> Option<T> {
+		self.pop().ok()
+	}
+
+	// Clears the extra elements from the array
+	// Effectively resets the length to min_size
+	// Returns the number of elements removed
+	pub fn clear(&mut self) -> usize {
+		let cleared = self.len - self.min_size;
+		self.len = self.min_size;
+		cleared
+	}
 }
 
 impl<T> Drop for RangeVec<T> {

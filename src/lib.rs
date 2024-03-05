@@ -19,6 +19,30 @@ mod tests {
 	}
 
 	#[test]
+	fn push_test() {
+		let mut range_vec = RangeVec::new((5, 10), &vec![0, 1, 4, 9, 16, 25]).unwrap();
+		range_vec.push(36).unwrap();
+		let back_to_vec: Vec<i32> = range_vec.into();
+		assert_eq!(back_to_vec, vec![0, 1, 4, 9, 16, 25, 36]);
+	}
+
+	#[test]
+	fn pop_test() {
+		let mut range_vec = RangeVec::new((5, 10), &vec![0, 1, 4, 9, 16, 25, 37]).unwrap();
+		assert_eq!(range_vec.try_pop(), Some(37));
+		let back_to_vec: Vec<i32> = range_vec.into();
+		assert_eq!(back_to_vec, vec![0, 1, 4, 9, 16, 25]);
+	}
+
+	#[test]
+	fn clear_test() {
+		let mut range_vec = RangeVec::new((3, 10), &vec![0, 1, 4, 9, 16, 25, 36]).unwrap();
+		assert_eq!(range_vec.clear(), 4);
+		let back_to_vec: Vec<i32> = range_vec.into();
+		assert_eq!(back_to_vec, vec![0, 1, 4]);
+	}
+
+	#[test]
 	fn memory_leak_test() {
 		let vec: Vec<i64> = (0..256).into_iter().map(|n| n * n).collect();
 		for _ in 0..100000 {
