@@ -134,6 +134,34 @@ impl<T> Drop for RangeVec<T> {
 	}
 }
 
+impl<T> Clone for RangeVec<T> {
+	fn clone(&self) -> Self {
+		let new_pointer = unsafe {
+			alloc(
+				Layout::from_size_align_unchecked(self.max_size * size_of::<T>(), align_of::<T>())
+			) as *mut T
+		};
+		unsafe {
+			ptr::copy_nonoverlapping(self.pointer, new_pointer, self.len);
+		}
+
+		Self {
+			pointer: new_pointer,
+			min_size: self.min_size,
+			max_size: self.max_size,
+			len: self.len,
+		}
+	}
+	fn clone_from(&mut self, source: &Self) {
+		self.min_size = source.min_size;
+		self.max_size = source.max_size;
+		self.len = source.len;
+		unsafe {
+			ptr::copy_nonoverlapping(source.pointer, self.pointer, source.len);
+		}
+	}
+}
+
 impl<T> std::ops::Index<usize> for RangeVec<T> {
 	type Output = T;
 	fn index(&self, index: usize) -> &Self::Output {

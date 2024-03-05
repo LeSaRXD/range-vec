@@ -62,6 +62,17 @@ fn equality() {
 }
 
 #[test]
+fn clone() {
+	let range_vec1 = RangeVec::new((5, 10), &vec![0, 1, 1, 2, 3, 5, 8]).unwrap();
+	let range_vec2 = range_vec1.clone();
+	assert_eq!(range_vec1, range_vec2);
+	
+	let vec1: Vec<i32> = range_vec1.into();
+	let vec2: Vec<i32> = range_vec2.into();
+	assert_eq!(vec1, vec2);
+}
+
+#[test]
 fn to_string() {
 	let range_vec = RangeVec::new((5, 10), &vec![0, 1, 1, 2, 3]).unwrap();
 	assert_eq!(range_vec.to_string(),
