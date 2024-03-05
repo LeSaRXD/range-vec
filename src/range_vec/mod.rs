@@ -1,4 +1,5 @@
 pub mod iter;
+pub mod display;
 
 use crate::error::{RangeVecResult, RangeVecErr::*};
 use std::ops::RangeInclusive;
@@ -6,7 +7,6 @@ use std::alloc::{alloc, dealloc, Layout};
 use std::mem::{size_of, align_of};
 use std::ptr;
 
-#[derive(Debug)]
 pub struct RangeVec<T> {
 	pointer: *mut T,
 	min_size: usize,

@@ -62,6 +62,20 @@ fn equality() {
 }
 
 #[test]
+fn to_string() {
+	let range_vec = RangeVec::new((5, 10), &vec![0, 1, 1, 2, 3]).unwrap();
+	assert_eq!(range_vec.to_string(),
+r#"[
+    0,
+    1,
+    1,
+    2,
+    3,
+]"#
+	);
+}
+
+#[test]
 fn memory_leak() {
 	let vec: Vec<i64> = (0..256).into_iter().map(|n| n * n).collect();
 	for _ in 0..100000 {
