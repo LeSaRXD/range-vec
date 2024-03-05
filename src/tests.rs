@@ -4,8 +4,8 @@ use crate::{range_vec::*, error::RangeVecErr::*};
 fn create() {
 	let mut vec = vec![1, 2, 3, 4, 5];
 
-	assert!(RangeVec::new((6, 10), &vec).is_err_and(|e| e == TooShort));
-	assert!(RangeVec::new((2, 4), &vec).is_err_and(|e| e == TooLong));
+	assert_eq!(RangeVec::new((6, 10), &vec), Err(TooShort));
+	assert_eq!(RangeVec::new((2, 4), &vec), Err(TooLong));
 
 	vec.push(6);
 	let range_vec: RangeVec<i32> = RangeVec::new((5, 10), &vec).unwrap();
