@@ -1,7 +1,7 @@
 use crate::error::{RangeVecResult, RangeVecErr::*};
 use std::ops::RangeInclusive;
 use std::alloc::{alloc, dealloc, Layout};
-use std::mem::size_of;
+use std::mem::{size_of, align_of};
 use std::ptr;
 
 
@@ -21,13 +21,15 @@ impl<T> RangeVec<T> {
 		if elements.len() > max_size {
 			return Err(TooLong)
 		}
+			
 		let pointer = unsafe {
-			let layout = Layout::from_size_align_unchecked(max_size, size_of::<T>());
-			alloc(layout) as *mut T
+			alloc(
+				Layout::from_size_align_unchecked(max_size * size_of::<T>(), align_of::<T>())
+			) as *mut T
 		};
 		unsafe {
 			for (i, elem) in elements.iter().enumerate() {
-				ptr::write(pointer.add(i), ptr::read(elem))
+				ptr::write(pointer.add(i), ptr::read(elem));
 			}
 		}
 		Ok(Self { pointer, min_size, max_size, len: elements.len() })
@@ -81,7 +83,7 @@ impl<T> Drop for RangeVec<T> {
 		unsafe {
 			dealloc(
 				self.pointer as *mut u8,
-				Layout::from_size_align_unchecked(self.max_size, size_of::<T>()),
+				Layout::from_size_align_unchecked(self.max_size * size_of::<T>(), align_of::<T>()),
 			)
 		};
 	}
@@ -104,7 +106,7 @@ impl<T> Into<Vec<T>> for RangeVec<T> {
 		unsafe {
 			let vec = Vec::from_raw_parts(self.pointer, self.len, self.max_size);
 			// clear the pointer so memory doesn't get deallocated
-			self.pointer = ptr::null_mut() as *mut T;
+			self.pointer = ptr::null_mut();
 			vec
 		}
 	}
