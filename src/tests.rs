@@ -1,4 +1,4 @@
-use crate::{range_vec::*, error::RangeVecErr::*};
+use crate::{RangeVec, error::RangeVecErr::*};
 
 #[test]
 fn create() {
@@ -66,6 +66,7 @@ fn clone() {
 	let range_vec1 = RangeVec::new((5, 10), &vec![0, 1, 1, 2, 3, 5, 8]).unwrap();
 	let range_vec2 = range_vec1.clone();
 	assert_eq!(range_vec1, range_vec2);
+	assert_ne!(range_vec1.pointer, range_vec2.pointer);
 	
 	let vec1: Vec<i32> = range_vec1.into();
 	let vec2: Vec<i32> = range_vec2.into();
