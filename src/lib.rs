@@ -43,11 +43,35 @@ mod tests {
 	}
 
 	#[test]
+	fn iter_test() {
+		let mut range_vec = RangeVec::new((5, 10), &vec![0, 1, 1, 2, 3, 5]).unwrap();
+		for elem in range_vec.iter_mut() {
+			*elem *= 2;
+		}
+		let back_to_vec: Vec<i32> = range_vec.into();
+		assert_eq!(back_to_vec, vec![0, 2, 2, 4, 6, 10]);
+ 	}
+
+	#[test]
+	fn equality_test() {
+		let mut vec = vec![1, 2, 3, 4, 5];
+		let range_vec1 = RangeVec::new((5, 12), &vec).unwrap();
+		let range_vec2 = RangeVec::new((5, 12), &vec).unwrap();
+		let range_vec3 = RangeVec::new((4, 12), &vec).unwrap();
+		vec[4] = 6;
+		let range_vec4 = RangeVec::new((4, 12), &vec).unwrap();
+
+		assert_eq!(range_vec1, range_vec2);
+		assert_ne!(range_vec1, range_vec3);
+		assert_ne!(range_vec3, range_vec4);
+	}
+
+	#[test]
 	fn memory_leak_test() {
 		let vec: Vec<i64> = (0..256).into_iter().map(|n| n * n).collect();
 		for _ in 0..100000 {
-			let _vec = RangeVec::new((10, 256), &vec).unwrap();
-			drop(_vec);
+			let allocated = RangeVec::new((10, 256), &vec).unwrap();
+			drop(allocated);
 		}
 	}
 }

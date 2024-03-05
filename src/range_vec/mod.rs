@@ -1,10 +1,12 @@
+pub mod iter;
+
 use crate::error::{RangeVecResult, RangeVecErr::*};
 use std::ops::RangeInclusive;
 use std::alloc::{alloc, dealloc, Layout};
 use std::mem::{size_of, align_of};
 use std::ptr;
 
-
+#[derive(Debug)]
 pub struct RangeVec<T> {
 	pointer: *mut T,
 	min_size: usize,
@@ -44,7 +46,7 @@ impl<T> RangeVec<T> {
 		}
 	}
 	// Get a mutable reference to an element by `index` if it exists
-	pub fn get_mut(&self, index: usize) -> Option<&mut T> {
+	pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
 		if index < self.len {
 			unsafe { Some(&mut *(self.pointer.add(index))) }
 		} else {
@@ -154,3 +156,19 @@ impl<T> Into<Vec<T>> for RangeVec<T> {
 		}
 	}
 }
+
+impl<T> PartialEq for RangeVec<T> where T: PartialEq {
+	fn eq(&self, other: &Self) -> bool {
+		self.max_size == other.max_size &&
+		self.min_size == other.min_size &&
+		self.len == other.len &&
+		self.iter().zip(other.iter()).all(|(a, b)| a == b)
+	}
+	fn ne(&self, other: &Self) -> bool {
+		self.max_size != other.max_size ||
+		self.min_size != other.min_size ||
+		self.len != other.len ||
+		self.iter().zip(other.iter()).any(|(a, b)| a != b)
+	}
+}
+impl<T> Eq for RangeVec<T> where T: Eq {}
