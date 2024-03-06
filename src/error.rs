@@ -15,8 +15,8 @@ impl Display for RangeVecErr {
 		match &self {
 			TooShort => write!(f, "Initialization vector is too short"),
 			TooLong => write!(f, "Initialization vector is too long"),
-			CantAdd => write!(f, "Cannot add element, the vector is already maximum size"),
-			CantRemove => write!(f, "Cannot remove element, the vector is already minimum size"),
+			CantAdd => write!(f, "Cannot add element(s), the vector is already maximum size"),
+			CantRemove => write!(f, "Cannot remove element(s), the vector is already minimum size"),
 		}
 	}
 }

@@ -21,24 +21,23 @@ pub struct RangeVec<T> {
 impl<T> RangeVec<T> {
 	// Create a new `RangeVec` given the minimum and maximum size, and the initial elements
 	pub fn new((min_size, max_size): (usize, usize), elements: &Vec<T>) -> RangeVecResult<Self> {
-		if elements.len() < min_size {
+		let len = elements.len();
+		if len < min_size {
 			return Err(TooShort)
 		}
-		if elements.len() > max_size {
+		if len > max_size {
 			return Err(TooLong)
 		}
 			
 		let pointer = unsafe {
-			alloc(
+			let pointer = alloc(
 				Layout::from_size_align_unchecked(max_size * size_of::<T>(), align_of::<T>())
-			) as *mut T
+			) as *mut T;
+			ptr::copy_nonoverlapping(elements.as_ptr(), pointer, len);
+			pointer
 		};
-		unsafe {
-			for (i, elem) in elements.iter().enumerate() {
-				ptr::write(pointer.add(i), ptr::read(elem));
-			}
-		}
-		Ok(Self { pointer, min_size, max_size, len: elements.len() })
+
+		Ok(Self { pointer, min_size, max_size, len })
 	}
 	
 	// Get a reference to an element by `index` if it exists
