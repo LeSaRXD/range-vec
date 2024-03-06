@@ -9,24 +9,21 @@ fn create() {
 
 	vec.push(6);
 	let range_vec: RangeVec<i32> = RangeVec::new((5, 10), &vec).unwrap();
-	let back_into_vec: Vec<i32> = range_vec.into();
-	assert_eq!(back_into_vec, vec);
+	assert_eq!(range_vec, vec);
 }
 
 #[test]
 fn push() {
 	let mut range_vec = RangeVec::new((5, 10), &vec![0, 1, 4, 9, 16, 25]).unwrap();
 	range_vec.push(36).unwrap();
-	let back_to_vec: Vec<i32> = range_vec.into();
-	assert_eq!(back_to_vec, vec![0, 1, 4, 9, 16, 25, 36]);
+	assert_eq!(range_vec, vec![0, 1, 4, 9, 16, 25, 36]);
 }
 
 #[test]
 fn pop() {
 	let mut range_vec = RangeVec::new((5, 10), &vec![0, 1, 4, 9, 16, 25, 37]).unwrap();
 	assert_eq!(range_vec.try_pop(), Some(37));
-	let back_to_vec: Vec<i32> = range_vec.into();
-	assert_eq!(back_to_vec, vec![0, 1, 4, 9, 16, 25]);
+	assert_eq!(range_vec, vec![0, 1, 4, 9, 16, 25]);
 }
 
 #[test]
@@ -39,16 +36,14 @@ fn extend() {
 	adding.pop();
 	assert_eq!(range_vec.try_extend(&adding), Some(10));
 	
-	let vec: Vec<i32> = range_vec.into();
-	assert_eq!(vec![0, 1, 4, 9, 16, 25, 36, 49, 64, 81], vec);
+	assert_eq!(range_vec, vec![0, 1, 4, 9, 16, 25, 36, 49, 64, 81]);
 }
 
 #[test]
 fn clear() {
 	let mut range_vec = RangeVec::new((3, 10), &vec![0, 1, 4, 9, 16, 25, 36]).unwrap();
 	assert_eq!(range_vec.clear(), 4);
-	let back_to_vec: Vec<i32> = range_vec.into();
-	assert_eq!(back_to_vec, vec![0, 1, 4]);
+	assert_eq!(range_vec, vec![0, 1, 4]);
 }
 
 #[test]
@@ -57,8 +52,7 @@ fn iter() {
 	for elem in range_vec.iter_mut() {
 		*elem *= 2;
 	}
-	let back_to_vec: Vec<i32> = range_vec.into();
-	assert_eq!(back_to_vec, vec![0, 2, 2, 4, 6, 10]);
+	assert_eq!(range_vec, vec![0, 2, 2, 4, 6, 10]);
 }
 
 #[test]
@@ -67,8 +61,14 @@ fn equality() {
 	let range_vec1 = RangeVec::new((5, 12), &vec).unwrap();
 	let range_vec2 = RangeVec::new((5, 12), &vec).unwrap();
 	let range_vec3 = RangeVec::new((4, 12), &vec).unwrap();
+	
+	assert_eq!(range_vec1, vec);
+	assert_eq!(range_vec2, vec);
+	assert_eq!(range_vec3, vec);
+
 	vec[4] = 6;
 	let range_vec4 = RangeVec::new((4, 12), &vec).unwrap();
+	assert_eq!(range_vec4, vec);
 
 	assert_eq!(range_vec1, range_vec2);
 	assert_ne!(range_vec1, range_vec3);

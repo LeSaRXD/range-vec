@@ -272,3 +272,22 @@ impl<T> PartialEq for RangeVec<T> where T: PartialEq {
 	}
 }
 impl<T> Eq for RangeVec<T> where T: Eq {}
+
+impl<T> PartialEq<Vec<T>> for RangeVec<T> where T: PartialEq {
+	fn eq(&self, other: &Vec<T>) -> bool {
+		self.len == other.len() &&
+		self.iter().zip(other).all(|(a, b)| a == b)
+	}
+	fn ne(&self, other: &Vec<T>) -> bool {
+		self.len != other.len() &&
+		self.iter().zip(other).all(|(a, b)| a != b)
+	}
+}
+impl<T> PartialEq<RangeVec<T>> for Vec<T> where T: PartialEq {
+	fn eq(&self, other: &RangeVec<T>) -> bool {
+		other.eq(self)
+	}
+	fn ne(&self, other: &RangeVec<T>) -> bool {
+		other.ne(self)
+	}
+}
