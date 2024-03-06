@@ -6,7 +6,7 @@ pub mod display;
 mod tests;
 
 use crate::error::{RangeVecResult, RangeVecErr::*};
-use std::ops::RangeInclusive;
+use std::ops::{Bound::*, RangeBounds, RangeInclusive};
 use std::alloc::{alloc, dealloc, Layout};
 use std::mem::{size_of, align_of};
 use std::ptr;
@@ -58,6 +58,56 @@ impl<T> RangeVec<T> {
 		}
 	}
 	
+	fn range_bounds(&self, range: impl RangeBounds<usize>) -> Option<(usize, usize)> {
+		let start = match range.start_bound() {
+			Included(index) => *index,
+			Excluded(index) => *index + 1,
+			Unbounded => 0,
+		};
+		let end = match range.end_bound() {
+			Included(index) => *index + 1,
+			Excluded(index) => *index,
+			Unbounded => self.len,
+		};
+		if end > self.len {
+			None
+		} else {
+			Some((start, end))
+		}
+	}
+	// Get a slice of the vector in a given range if it exists`
+	pub fn get_slice(&self, range: impl RangeBounds<usize>) -> Option<&[T]> {
+		let (start, end) = self.range_bounds(range)?;
+
+		Some(
+			unsafe {
+				& *ptr::slice_from_raw_parts(self.pointer.add(start), end - start)
+			}
+		)
+	}
+	// Get a mutable slice of the vector in a given range if it exists
+	pub fn get_slice_mut(&mut self, range: impl RangeBounds<usize>) -> Option<&mut [T]> {
+		let (start, end) = self.range_bounds(range)?;
+
+		Some(
+			unsafe {
+				&mut *ptr::slice_from_raw_parts_mut(self.pointer.add(start), end - start)
+			}
+		)
+	}
+	// Get the whole vector as a slice
+	pub fn as_slice(&self) -> &[T] {
+		unsafe {
+			& *ptr::slice_from_raw_parts(self.pointer, self.len)
+		}
+	}
+	// Get the whole vector as a mutable slice
+	pub fn as_slice_mut(&mut self) -> &mut [T] {
+		unsafe {
+			&mut *ptr::slice_from_raw_parts_mut(self.pointer, self.len)
+		}
+	}
+
 	// Get the size of the vector
 	pub fn size(&self) -> (usize, usize) {
 		(self.min_size, self.max_size)

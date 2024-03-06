@@ -67,7 +67,7 @@ fn clone() {
 	let range_vec2 = range_vec1.clone();
 	assert_eq!(range_vec1, range_vec2);
 	assert_ne!(range_vec1.pointer, range_vec2.pointer);
-	
+
 	let vec1: Vec<i32> = range_vec1.into();
 	let vec2: Vec<i32> = range_vec2.into();
 	assert_eq!(vec1, vec2);
@@ -85,6 +85,26 @@ r#"[
     3,
 ]"#
 	);
+}
+
+#[test]
+fn index_slice() {
+	let range_vec = RangeVec::new((5, 10), &vec![0, 1, 1, 2, 3, 5, 8, 13]).unwrap();
+	assert_eq!(range_vec[6], 8);
+
+	let slice1 = range_vec.get_slice(3..6).unwrap();
+	assert_eq!(slice1[0], 2);
+	assert_eq!(slice1[1], 3);
+	assert_eq!(slice1[2], 5);
+
+	let slice2 = range_vec.get_slice(4..).unwrap();
+	assert_eq!(slice2[3], 13);
+
+	let slice3 = range_vec.as_slice();
+	let slice4 = range_vec.get_slice(..).unwrap();
+	let vec: Vec<i32> = range_vec.clone().into();
+	assert_eq!(slice3, slice4);
+	assert_eq!(slice3, vec.as_slice());
 }
 
 #[test]
