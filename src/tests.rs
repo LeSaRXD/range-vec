@@ -30,6 +30,20 @@ fn pop() {
 }
 
 #[test]
+fn extend() {
+	let mut range_vec = RangeVec::new((5, 10), &vec![0, 1, 4, 9, 16, 25, 36]).unwrap();
+	let mut adding = vec![49, 64, 81, 100];
+	
+	assert_eq!(range_vec.extend(&adding), Err(CantAdd));
+	
+	adding.pop();
+	assert_eq!(range_vec.try_extend(&adding), Some(10));
+	
+	let vec: Vec<i32> = range_vec.into();
+	assert_eq!(vec![0, 1, 4, 9, 16, 25, 36, 49, 64, 81], vec);
+}
+
+#[test]
 fn clear() {
 	let mut range_vec = RangeVec::new((3, 10), &vec![0, 1, 4, 9, 16, 25, 36]).unwrap();
 	assert_eq!(range_vec.clear(), 4);

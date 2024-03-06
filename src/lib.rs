@@ -162,6 +162,25 @@ impl<T> RangeVec<T> {
 		self.pop().ok()
 	}
 
+	// Extetnds the current vector with the elements from `other`
+	// Returns the new length on success
+	pub fn extend(&mut self, other: &Vec<T>) -> RangeVecResult<usize> {
+		if self.len + other.len() > self.max_size {
+			return Err(CantAdd);
+		}
+		let added_len = other.len();
+		unsafe {
+			ptr::copy_nonoverlapping(other.as_ptr(), self.pointer.add(self.len), other.len());
+		}
+		self.len += added_len;
+		Ok(self.len)
+	}
+	// Tries extetnding the current vector with the elements from `other`
+	// Returns the new length on success
+	pub fn try_extend(&mut self, other: &Vec<T>) -> Option<usize> {
+		self.extend(other).ok()
+	} 
+
 	// Clears the extra elements from the array
 	// Effectively resets the length to min_size
 	// Returns the number of elements removed
