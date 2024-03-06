@@ -107,6 +107,11 @@ impl<T> RangeVec<T> {
 		}
 	}
 
+	// Calls `.into()` for Vec<T>
+	pub fn into_vec(self) -> Vec<T> {
+		self.into()
+	}
+
 	// Get the size of the vector
 	pub fn size(&self) -> (usize, usize) {
 		(self.min_size, self.max_size)
