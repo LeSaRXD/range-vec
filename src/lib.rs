@@ -22,13 +22,16 @@ impl<T> RangeVec<T> {
 	// Create a new `RangeVec` given the minimum and maximum size, and the initial elements
 	pub fn new((min_size, max_size): (usize, usize), elements: &Vec<T>) -> RangeVecResult<Self> {
 		let len = elements.len();
+		if min_size > max_size {
+			return Err(IncorrectSize)
+		}
 		if len < min_size {
 			return Err(TooShort)
 		}
 		if len > max_size {
 			return Err(TooLong)
 		}
-			
+
 		let pointer = unsafe {
 			let pointer = alloc(
 				Layout::from_size_align_unchecked(max_size * size_of::<T>(), align_of::<T>())
@@ -39,7 +42,7 @@ impl<T> RangeVec<T> {
 
 		Ok(Self { pointer, min_size, max_size, len })
 	}
-	
+
 	// Get a reference to an element by `index` if it exists
 	pub fn get(&self, index: usize) -> Option<&T> {
 		if index < self.len {
@@ -56,7 +59,7 @@ impl<T> RangeVec<T> {
 			None
 		}
 	}
-	
+
 	fn range_bounds(&self, range: impl RangeBounds<usize>) -> Option<(usize, usize)> {
 		let start = match range.start_bound() {
 			Included(index) => *index,
