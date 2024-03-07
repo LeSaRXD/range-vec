@@ -9,6 +9,9 @@ fn create() {
 
 	vec.push(6);
 	let range_vec: RangeVec<i32> = RangeVec::new((5, 10), &vec).unwrap();
+	assert_eq!(range_vec.min_size, 5);
+	assert_eq!(range_vec.max_size, 10);
+	assert_eq!(range_vec.len, 6);
 	assert_eq!(range_vec, vec);
 }
 

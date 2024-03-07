@@ -164,7 +164,7 @@ impl<T> RangeVec<T> {
 		self.len -= 1;
 		Ok(elem)
 	}
-	// Tries removeing and returning an element from the end of the vector if there are enough left
+	// Tries removing and returning an element from the end of the vector if there are enough left
 	// Returns Some(element) if it succeeded, None otherwise
 	pub fn try_pop(&mut self) -> Option<T> {
 		self.pop().ok()
